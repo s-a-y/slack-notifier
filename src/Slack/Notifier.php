@@ -4,6 +4,8 @@ namespace Slack;
 
 use Slack\Message\MessageInterface;
 
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Slack\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -33,8 +35,10 @@ class Notifier
     public function __construct($client, $serializer = null)
     {
         if (!$serializer) {
-            $normalizer = new GetSetMethodNormalizer();
-            $normalizer->setCamelizedAttributes(array('icon_emoji', 'icon_url'));
+            $normalizer = new ObjectNormalizer(
+                null,
+                new CamelCaseToSnakeCaseNameConverter(array('icon_emoji', 'icon_url'))
+            );
 
             $serializer = new Serializer(
                 array($normalizer),
